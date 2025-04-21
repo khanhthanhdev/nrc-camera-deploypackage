@@ -1,5 +1,5 @@
 [Unit]
-Description=The p2p camera via webrtc.
+Description=The camera service via webrtc - used for National Robotics Challenge.
 After=network-online.target
 
 [Service]
