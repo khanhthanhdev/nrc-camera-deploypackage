@@ -5,7 +5,7 @@ After=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=/etc/s4v
-ExecStart=/etc/s4v/pi_webrtc --camera=libcamera:0 --fps=30 --width=1280 --height=960 --use_whep --http_port=8080 --uid=s4v --no_audio
+ExecStart=/etc/s4v/pi_webrtc --camera=libcamera:0 --fps=30 --width=1280 --height=960 --fixed_resolution --use_whep --http_port=8080 --uid=s4v --no_audio
 Restart=always
 RestartSec=10
 
