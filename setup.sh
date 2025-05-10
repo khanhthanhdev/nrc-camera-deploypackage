@@ -30,7 +30,7 @@ apt update && apt upgrade -y
 
 # Install required packages
 echo "Installing necessary packages..."
-apt install wget libmosquitto1 pulseaudio libavformat59 libswscale6 -y
+apt install wget libcamera0.5 libmosquitto1 pulseaudio libavformat59 libswscale6 -y
 
 # Check if nginx is installed and handle accordingly
 if command -v nginx &>/dev/null; then
@@ -49,7 +49,7 @@ fi
 
 # Create /etc/s4v directory and download the tar.gz file
 mkdir -p /etc/s4v
-wget https://github.com/TzuHuanTai/RaspberryPi-WebRTC/releases/download/v1.0.6-rc.3/pi_webrtc-v1.0.6-rc.3_raspios-bookworm-arm64.tar.gz -O /etc/s4v/pi_webrtc.tar.gz
+wget https://github.com/TzuHuanTai/RaspberryPi-WebRTC/releases/download/v1.0.7/pi-webrtc-v1.0.7_raspios-bookworm-arm64.tar.gz -O /etc/s4v/pi_webrtc.tar.gz
 
 # Extract the tar.gz file and clean up
 tar -xzf /etc/s4v/pi_webrtc.tar.gz -C /etc/s4v
