@@ -135,10 +135,11 @@ configure_usb_serial_gadget() {
         if confirm_action "Do you want to add USB Serial Gadget configuration to ${CONFIG_TXT_PATH}?"; then
             cp "${CONFIG_TXT_PATH}" "${CONFIG_TXT_PATH}.backup.$(date +%F-%H%M%S)"
             if grep -q "^\[all\]" "${CONFIG_TXT_PATH}"; then
-                sed -i 	'/^\[all\]/a dtoverlay=dwc2,dr_mode=peripheral	' "${CONFIG_TXT_PATH}"
+                sed -i '/^\[all\]/a dtoverlay=dwc2,dr_mode=peripheral' "${CONFIG_TXT_PATH}"
             else
                 echo -e "\n[all]\ndtoverlay=dwc2,dr_mode=peripheral" >> "${CONFIG_TXT_PATH}"
             fi
+            echo "dtoverlay=dwc2" >> "${CONFIG_TXT_PATH}"  # Ensure it's at the end
             echo_info "USB Serial Gadget configuration added to ${CONFIG_TXT_PATH}."
         else
             echo_warn "Skipping USB Serial Gadget configuration in ${CONFIG_TXT_PATH}."
@@ -153,7 +154,7 @@ configure_usb_serial_gadget() {
         echo_info "Adding modules-load=dwc2,g_serial to ${CMDLINE_TXT_PATH}..."
         if confirm_action "Do you want to add USB Serial Gadget modules to ${CMDLINE_TXT_PATH}?"; then
             cp "${CMDLINE_TXT_PATH}" "${CMDLINE_TXT_PATH}.backup.$(date +%F-%H%M%S)"
-            sed -i 	's/rootwait/rootwait modules-load=dwc2,g_serial/	' "${CMDLINE_TXT_PATH}"
+            sed -i 's/rootwait/rootwait modules-load=dwc2,g_serial/g' "${CMDLINE_TXT_PATH}"
             echo_info "USB Serial Gadget modules added to ${CMDLINE_TXT_PATH}."
         else
             echo_warn "Skipping USB Serial Gadget modules configuration in ${CMDLINE_TXT_PATH}."
@@ -165,7 +166,7 @@ configure_usb_serial_gadget() {
     systemctl enable getty@ttyGS0.service
     echo_info "Getty service enabled for USB Serial Gadget."
     
-    echo_info "USB Serial Gadget configuration completed."
+    echo_info "USB Serial Gadget configuration completed. Reboot to apply changes."
 }
 
 # --- Main Script Execution ---
