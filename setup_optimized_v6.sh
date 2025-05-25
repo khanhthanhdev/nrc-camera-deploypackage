@@ -127,26 +127,33 @@ install_packages() {
 }
 
 configure_usb_serial_gadget() {
-    echo_step "Configuring USB Serial Gadget..."
-    
-    # Configure config.txt
     echo_info "Checking and updating ${CONFIG_TXT_PATH}..."
-    if grep -q "^dtoverlay=dwc2" "${CONFIG_TXT_PATH}"; then
-        echo_info "USB Serial Gadget (dtoverlay=dwc2) already configured in ${CONFIG_TXT_PATH}."
-    else
-        echo_info "Adding dtoverlay=dwc2 to ${CONFIG_TXT_PATH}..."
-        if confirm_action "Do you want to add USB Serial Gadget configuration to ${CONFIG_TXT_PATH}?"; then
-            cp "${CONFIG_TXT_PATH}" "${CONFIG_TXT_PATH}.backup.$(date +%F-%H%M%S)"
-            if grep -q "^\[all\]" "${CONFIG_TXT_PATH}"; then
-                sed -i \'/^\[all\]/a dtoverlay=dwc2,dr_mode=peripheral\' "${CONFIG_TXT_PATH}"
-            else
-                echo -e "\n[all]\ndtoverlay=dwc2,dr_mode=peripheral" >> "${CONFIG_TXT_PATH}"
-            fi
-            echo_info "USB Serial Gadget configuration added to ${CONFIG_TXT_PATH}."
+
+# Kiểm tra nếu dòng đã tồn tại
+if grep -q "^dtoverlay=dwc2" "${CONFIG_TXT_PATH}"; then
+    echo_info "USB Serial Gadget (dtoverlay=dwc2) already configured in ${CONFIG_TXT_PATH}."
+else
+    echo_info "Adding dtoverlay=dwc2,dr_mode=peripheral to ${CONFIG_TXT_PATH}..."
+    
+    if confirm_action "Do you want to add USB Serial Gadget configuration to ${CONFIG_TXT_PATH}?"; then
+        # Sao lưu file gốc
+        cp "${CONFIG_TXT_PATH}" "${CONFIG_TXT_PATH}.backup.$(date +%F-%H%M%S)"
+        
+        # Nếu có [all], chèn ngay sau dòng [all] cuối cùng
+        if grep -q "^\[all\]" "${CONFIG_TXT_PATH}"; then
+            last_all_line=$(grep -n "^\[all\]" "${CONFIG_TXT_PATH}" | tail -n 1 | cut -d: -f1)
+            awk -v line=$last_all_line 'NR==line{print; print "dtoverlay=dwc2,dr_mode=peripheral"; next} 1' \
+                "${CONFIG_TXT_PATH}" > "${CONFIG_TXT_PATH}.tmp" && mv "${CONFIG_TXT_PATH}.tmp" "${CONFIG_TXT_PATH}"
         else
-            echo_warn "Skipping USB Serial Gadget configuration in ${CONFIG_TXT_PATH}."
+            # Nếu không có [all], thêm mới ở cuối
+            echo -e "\n[all]\ndtoverlay=dwc2,dr_mode=peripheral" >> "${CONFIG_TXT_PATH}"
         fi
+
+        echo_info "USB Serial Gadget configuration added successfully to ${CONFIG_TXT_PATH}."
+    else
+        echo_warn "Skipping USB Serial Gadget configuration in ${CONFIG_TXT_PATH}."
     fi
+fi
     
     # Configure cmdline.txt
     echo_info "Checking and updating ${CMDLINE_TXT_PATH}..."
