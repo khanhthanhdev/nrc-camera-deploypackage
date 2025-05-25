@@ -129,18 +129,23 @@ install_packages() {
 configure_usb_serial_gadget() {
     echo_info "Checking and updating ${CONFIG_TXT_PATH}..."
     
-    # Check if the line already exists
-    if grep -q "^dtoverlay=dwc2" "${CONFIG_TXT_PATH}"; then
-        echo_info "USB Serial Gadget (dtoverlay=dwc2) already configured in ${CONFIG_TXT_PATH}."
+    # Check if the specific peripheral mode line already exists
+    if grep -q "^dtoverlay=dwc2,dr_mode=peripheral" "${CONFIG_TXT_PATH}"; then
+        echo_info "USB Serial Gadget (dtoverlay=dwc2,dr_mode=peripheral) already configured in ${CONFIG_TXT_PATH}."
     else
-        echo_info "Adding dtoverlay=dwc2 to ${CONFIG_TXT_PATH}..."
+        echo_info "Adding dtoverlay=dwc2,dr_mode=peripheral to ${CONFIG_TXT_PATH}..."
         
         if confirm_action "Do you want to add USB Serial Gadget configuration to ${CONFIG_TXT_PATH}?"; then
             # Backup the original file
             cp "${CONFIG_TXT_PATH}" "${CONFIG_TXT_PATH}.backup.$(date +%F-%H%M%S)"
             
-            # Simply append to the end of the file
-            echo "dtoverlay=dwc2" >> "${CONFIG_TXT_PATH}"
+            # Check if there's any existing dtoverlay=dwc2 line (for informational purposes)
+            if grep -q "^dtoverlay=dwc2" "${CONFIG_TXT_PATH}"; then
+                echo_info "Found existing dtoverlay=dwc2 configuration. Adding peripheral mode configuration alongside it..."
+            fi
+            
+            # Add the new configuration line at the end of the file
+            echo "dtoverlay=dwc2,dr_mode=peripheral" >> "${CONFIG_TXT_PATH}"
             
             echo_info "USB Serial Gadget configuration added successfully to ${CONFIG_TXT_PATH}."
         else
